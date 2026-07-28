@@ -158,8 +158,48 @@ function saveMember(data) {
     data.notes || ''
   ]);
 
+  sh.getRange(sh.getLastRow(), memberPhoneColumn_()).setValue(data.primaryPhone || '');
+
   syncSecretariatMember_(id, data);
   return {id: id, message: 'Member successfully added.'};
+}
+
+
+function memberPhoneColumn_() {
+  const sh = sheet_('Members');
+  const lastColumn = Math.max(sh.getLastColumn(), 1);
+  const headers = sh.getRange(1, 1, 1, lastColumn).getDisplayValues()[0];
+  const accepted = ['primary phone', 'phone', 'mobile', 'mobile phone', 'phone number'];
+  const index = headers.findIndex(h => accepted.indexOf(normalize_(h)) >= 0);
+  if (index >= 0) return index + 1;
+
+  const column = lastColumn + 1;
+  sh.getRange(1, column).setValue('Primary Phone');
+  return column;
+}
+
+function memberParticipationIndex_() {
+  const committees = {};
+  rows_('TC Members').forEach(r => {
+    if (normalize_(r[7]) === 'inactive') return;
+    const memberId = String(r[1] || '').trim();
+    const tcName = String(r[5] || '').trim();
+    if (!memberId || !tcName) return;
+    if (!committees[memberId]) committees[memberId] = [];
+    if (committees[memberId].indexOf(tcName) < 0) committees[memberId].push(tcName);
+  });
+
+  const tasks = {};
+  rows_('Task Force Members').forEach(r => {
+    if (normalize_(r[7]) === 'inactive') return;
+    const memberId = String(r[3] || '').trim();
+    const taskName = String(r[2] || '').trim();
+    if (!memberId || !taskName) return;
+    if (!tasks[memberId]) tasks[memberId] = [];
+    if (tasks[memberId].indexOf(taskName) < 0) tasks[memberId].push(taskName);
+  });
+
+  return {committees: committees, tasks: tasks};
 }
 
 function getMembers(filters) {
@@ -167,6 +207,9 @@ function getMembers(filters) {
   const q = normalize_(filters.query);
   const tso = String(filters.tso || '');
   const status = String(filters.status || '');
+
+  const phoneColumn = memberPhoneColumn_();
+  const participation = memberParticipationIndex_();
 
   return rows_('Members')
     .filter(r => {
@@ -182,7 +225,10 @@ function getMembers(filters) {
       tsoCode: r[7],
       role: r[9],
       status: r[10],
-      memberType: r[6]
+      memberType: r[6],
+      primaryPhone: r[phoneColumn - 1] || '',
+      technicalCommittees: participation.committees[r[0]] || [],
+      assignedTasks: participation.tasks[r[0]] || []
     }))
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
@@ -191,7 +237,10 @@ function getMember(memberId) {
   const row = findRow_('Members', 1, memberId);
   if (!row) throw new Error('Member not found.');
 
-  const r = sheet_('Members').getRange(row, 1, 1, 16).getDisplayValues()[0];
+  const sh = sheet_('Members');
+  const phoneColumn = memberPhoneColumn_();
+  const r = sh.getRange(row, 1, 1, sh.getLastColumn()).getDisplayValues()[0];
+  const participation = memberParticipationIndex_();
 
   return {
     memberId: r[0],
@@ -208,7 +257,10 @@ function getMember(memberId) {
     joinedDate: r[11],
     joinedPhase: r[12],
     lateJoiner: r[13],
-    notes: r[15]
+    notes: r[15],
+    primaryPhone: r[phoneColumn - 1] || '',
+    technicalCommittees: participation.committees[r[0]] || [],
+    assignedTasks: participation.tasks[r[0]] || []
   };
 }
 
@@ -243,6 +295,7 @@ function updateMember(data) {
     data.notes || ''
   ]]);
 
+  sh.getRange(row, memberPhoneColumn_()).setValue(data.primaryPhone || '');
   syncSecretariatMember_(data.memberId, data);
   return {id: data.memberId, message: 'Member successfully updated.'};
 }
