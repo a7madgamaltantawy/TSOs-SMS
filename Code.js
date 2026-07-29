@@ -20,7 +20,6 @@ function onOpen() {
       ui.createMenu('KPIs')
         .addItem('Refresh KPIs & Dashboard', 'refreshAllKPIs')
         .addItem('Open Dashboard', 'openDashboard')
-        .addItem('Open KPI Guide', 'openKPIGuide')
     )
     .addToUi();
 }
