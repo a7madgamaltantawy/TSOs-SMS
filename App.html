@@ -2,147 +2,77 @@
 <html>
 <head>
   <base target="_top">
-  <meta charset="utf-8">
   <style>
-    :root{--navy:#123b5d;--blue:#1f5f8b;--soft:#edf4f8;--line:#d8e1e7;--text:#24323d;--muted:#667784;--ok:#18794e;--bad:#b42318}
-    *{box-sizing:border-box}body{margin:0;background:#f5f7f9;color:var(--text);font:13px Arial,sans-serif}
-    header{padding:16px;background:linear-gradient(135deg,var(--navy),var(--blue));color:white}header h1{font-size:17px;margin:0}header small{opacity:.85}
-    nav{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:9px;background:white;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-    nav button{border:1px solid var(--line);background:white;border-radius:6px;padding:8px 4px;font-weight:700;font-size:11px;cursor:pointer}nav button.active{background:var(--blue);color:white;border-color:var(--blue)}
-    main{padding:10px}.page{display:none}.page.active{display:block}.panel{background:white;border:1px solid var(--line);border-radius:9px;padding:11px;margin-bottom:10px;box-shadow:0 2px 9px rgba(18,59,93,.06)}
-    h2{font-size:14px;color:var(--navy);margin:0 0 9px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.full{grid-column:1/-1}
-    label{display:block;font-size:11px;font-weight:700;margin:0 0 4px}input,select,textarea{width:100%;border:1px solid #c9d5dd;border-radius:6px;padding:8px;font:inherit;background:white}textarea{min-height:65px;resize:vertical}
-    .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}button.primary,button.secondary,button.danger{border-radius:6px;padding:8px 11px;font-weight:700;cursor:pointer}.primary{border:1px solid var(--blue);background:var(--blue);color:white}.secondary{border:1px solid var(--blue);background:white;color:var(--blue)}.danger{border:1px solid var(--bad);background:white;color:var(--bad)}
-    .metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.metric{background:var(--soft);border-radius:8px;padding:10px}.metric b{display:block;font-size:22px;color:var(--navy)}.metric span{font-size:11px;color:var(--muted)}
-    .msg{display:none;margin-bottom:9px;border-radius:7px;padding:9px}.msg.ok{display:block;background:#eaf7f0;color:#14532d}.msg.err{display:block;background:#fdecec;color:#7f1d1d}.msg.warn{display:block;background:#fff7d6;color:#713f12}
-    .cards{max-height:330px;overflow:auto}.card{border:1px solid var(--line);border-radius:7px;padding:9px;margin-bottom:6px;cursor:pointer}.card:hover{border-color:var(--blue)}.card b{color:var(--navy)}.meta{font-size:11px;color:var(--muted);margin-top:3px}.pill{display:inline-block;background:var(--soft);color:var(--blue);font-weight:700;border-radius:99px;padding:2px 6px;margin-right:3px}
-    .roster{max-height:390px;overflow:auto}.person{display:grid;grid-template-columns:1fr 105px;gap:7px;align-items:center;border-bottom:1px solid var(--line);padding:7px 0}.person input{width:auto}.muted{color:var(--muted);font-size:11px}.hidden{display:none!important}.toolbar{display:grid;grid-template-columns:1fr auto;gap:7px;margin:8px 0}.totals{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:8px 0}.total{background:var(--soft);border-radius:7px;padding:7px;text-align:center}.total b{display:block;color:var(--navy);font-size:17px}.grouped option{font-weight:normal}
-  
-    .dash-hero{background:linear-gradient(135deg,#123b5d,#1f5f8b);color:white;border-radius:12px;padding:14px;margin-bottom:10px}.dash-hero h2{color:white;font-size:17px;margin:0}.dash-hero p{margin:4px 0 0;opacity:.85;font-size:11px}
-    .dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}.dash-kpi{background:white;border:1px solid var(--line);border-radius:10px;padding:10px;position:relative;overflow:hidden}.dash-kpi:after{content:'';position:absolute;right:-16px;top:-16px;width:48px;height:48px;border-radius:50%;background:var(--soft)}.dash-kpi b{display:block;color:var(--navy);font-size:22px;position:relative;z-index:1}.dash-kpi span{font-size:10px;color:var(--muted);position:relative;z-index:1}
-    .health-list{display:grid;gap:8px}.health-row{display:grid;grid-template-columns:minmax(100px,1fr) 2fr 46px;gap:8px;align-items:center}.health-name{font-weight:700;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.health-track{height:10px;background:#e7edf1;border-radius:99px;overflow:hidden}.health-fill{height:100%;background:var(--ok);border-radius:99px}.health-fill.watch{background:#b7791f}.health-fill.critical{background:var(--bad)}.health-value{text-align:right;font-weight:700;font-size:11px}
-    .issue-list{display:grid;gap:6px}.issue{border-left:4px solid var(--bad);background:#fff;border-radius:7px;padding:8px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.issue b{color:var(--navy);font-size:11px}.meeting-row{display:grid;grid-template-columns:72px 1fr;gap:8px;border-bottom:1px solid var(--line);padding:7px 0}.meeting-row:last-child{border-bottom:0}.meeting-date{font-weight:700;color:var(--blue);font-size:10px}.dash-meta{text-align:right;color:var(--muted);font-size:9px;margin-top:6px}
-    @media(max-width:620px){.dash-grid{grid-template-columns:repeat(2,1fr)}.health-row{grid-template-columns:95px 1fr 42px}}
+    body{font-family:Arial,sans-serif;margin:0;background:#f5f7fa;color:#1f2937}
+    header{background:#0f3d56;color:white;padding:16px;font-size:18px;font-weight:700}
+    .tabs{display:flex;flex-wrap:wrap;background:white;border-bottom:1px solid #d1d5db}
+    .tabs button{border:0;background:white;padding:10px 12px;cursor:pointer;font-weight:600;color:#374151}
+    .tabs button.active{background:#d9eaf7;color:#0f3d56}
+    .panel{display:none;padding:14px}.panel.active{display:block}
+    label{display:block;font-size:12px;font-weight:700;margin-top:10px;margin-bottom:4px}
+    input,select,textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid #cbd5e1;border-radius:5px;background:white}
+    textarea{min-height:72px}
+    .save{margin-top:14px;width:100%;padding:10px;background:#1f4e78;color:white;border:0;border-radius:5px;font-weight:700;cursor:pointer}
+    .msg{margin-top:10px;font-size:12px;color:#166534}
   </style>
 </head>
 <body>
-<header><h1>MED-TSO Secretariat Management System</h1><small id="version">Loading…</small></header>
-<nav>
-  <button class="active" data-page="home">Steering Dashboard</button><button data-page="members">Members</button><button data-page="structure">Structure</button>
-  <button data-page="meetings">Meetings</button><button data-page="attendance">Attendance</button><button data-page="kpis">KPIs</button>
-</nav>
-<main>
-<div id="msg" class="msg"></div>
-<section id="home" class="page active">
-  <div class="dash-hero"><h2>Steering Committee Dashboard</h2><p>Governance, participation and delivery overview. Data is read directly from the management workbook.</p></div>
-  <div id="steeringLoading" class="panel muted">Loading Steering Committee indicators…</div>
-  <div id="steeringDashboard" class="hidden">
-    <div id="steeringCards" class="dash-grid"></div>
-    <div class="panel"><div class="exec-head"><h2>Committee health</h2><button class="secondary" onclick="loadSteeringDashboard()">Refresh</button></div><div id="committeeHealth" class="health-list"></div></div>
-    <div class="panel"><h2>Critical tasks and risks</h2><div id="steeringIssues" class="issue-list"></div></div>
-    <div class="panel"><h2>Upcoming meetings — next 60 days</h2><div id="steeringMeetings"></div><div id="steeringGenerated" class="dash-meta"></div></div>
-  </div>
-  <div id="setupBox" class="panel hidden"><h2>One-time setup</h2><p class="muted">Create the unified Groups and Group Members model and migrate existing committee, team, task-force and governance memberships. Existing sheets and records are preserved.</p><button class="primary" onclick="setupGroups()">Initialize unified groups</button></div>
-</section>
-<section id="members" class="page">
-  <div class="panel"><h2>Search members</h2><div class="grid"><input id="mq" class="full" placeholder="Name, email, ID, TSO or role"><select id="mtso"></select><select id="mstatus"><option value="">All statuses</option><option>Active</option><option>Inactive</option><option>Archived</option></select></div><div class="actions"><button class="primary" onclick="searchMembers()">Search</button><button class="secondary" onclick="newMember()">New member</button></div><div id="memberCards" class="cards" style="margin-top:9px"></div></div>
-  <div id="memberForm" class="panel hidden"><h2 id="memberFormTitle">New member</h2><input type="hidden" id="memberId"><div class="grid">
-    <div><label>First name *</label><input id="firstName"></div><div><label>Last name *</label><input id="lastName"></div>
-    <div class="full"><label>Primary email *</label><input id="primaryEmail" type="email"></div><div class="full"><label>Secondary email</label><input id="secondaryEmail" type="email"></div>
-    <div><label>Member type</label><select id="memberType"><option>TSO Member</option><option>Secretariat Member</option><option>External Expert</option><option>Observer</option></select></div><div><label>Status</label><select id="memberStatus"><option>Active</option><option>Inactive</option><option>Archived</option></select></div>
-    <div><label>TSO</label><select id="memberTso"></select></div><div><label>Country code</label><input id="countryCode"></div>
-    <div class="full"><label>Role / function</label><input id="role"></div><div class="full"><label>Joined TEASIMED3 date</label><input id="joinedDate" type="date"></div>
-    <div class="full"><label>Notes</label><textarea id="memberNotes"></textarea></div>
-  </div><div class="actions"><button class="primary" onclick="saveMemberForm()">Save</button><button class="secondary" onclick="closeMember()">Cancel</button><button id="deactivateBtn" class="danger hidden" onclick="deactivateMember()">Set inactive</button></div></div>
-</section>
-<section id="structure" class="page">
-  <div class="panel"><h2>Technical Committee membership</h2><div class="grid"><select id="tcMember" class="full"></select><select id="tcName"></select><select id="tcRole"><option>Member</option><option>Chairman</option><option>Vice-Chairman</option><option>Technical Secretariat</option><option>Alternate</option><option>Observer</option><option>Guest</option></select><div><label>Planning Data SPOC</label><select id="planningSpoc"><option>No</option><option>Yes</option></select></div><div><label>Status</label><select id="tcStatus"><option>Active</option><option>Inactive</option></select></div></div><div class="actions"><button class="primary" onclick="saveTcMembership()">Save TC membership</button></div></div>
-  <div class="panel"><h2>Operational Team membership</h2><div class="grid"><select id="teamMember" class="full"></select><select id="teamId"></select><select id="teamRole"><option>Member</option><option>Team Lead</option><option>Deputy Lead</option><option>Technical Secretariat</option><option>SPOC</option><option>Alternate</option></select></div><div class="actions"><button class="primary" onclick="saveTeamMembership()">Save team membership</button></div></div>
-  <div class="panel"><h2>General TSO SPOC</h2><div class="grid"><select id="spocMember" class="full"></select><select id="spocType"><option>General TSO SPOC</option><option>Data SPOC</option><option>Administrative SPOC</option><option>Communication SPOC</option></select><select id="spocPrimary"><option>No</option><option>Yes</option></select></div><div class="actions"><button class="primary" onclick="saveSpoc()">Save SPOC</button></div></div>
-</section>
-<section id="meetings" class="page">
-  <div class="panel"><h2>Create meeting</h2><div class="grid"><div class="full"><label>Meeting group *</label><select id="meetingGroup"></select></div><div class="full"><label>Meeting name *</label><input id="meetingName"></div><div><label>Date *</label><input id="meetingDate" type="date"></div><div><label>Type</label><select id="meetingType"><option>Regular</option><option>Plenary</option><option>Workshop</option><option>Task Force</option><option>Extraordinary</option></select></div><div><label>Status</label><select id="meetingStatus"><option>Planned</option><option>Completed</option><option>Cancelled</option></select></div><div class="full"><label>Description</label><textarea id="meetingDescription"></textarea></div></div><div class="actions"><button class="primary" onclick="createMeeting()">Create meeting</button></div></div>
-  <div class="panel"><h2>Create task force / task</h2><div class="grid"><select id="taskTc"></select><select id="workstream"></select><div class="full"><label>Task name *</label><input id="taskName"></div><div><label>Status</label><select id="taskStatus"><option>Not Started</option><option>Active</option><option>On Hold</option><option>Completed</option></select></div><div><label>Priority</label><select id="taskPriority"><option>Normal</option><option>High</option><option>Critical</option><option>Low</option></select></div><div><label>Due date</label><input id="taskDue" type="date"></div><div class="full"><label>Description</label><textarea id="taskDescription"></textarea></div></div><div class="actions"><button class="primary" onclick="createTask()">Create task</button></div></div>
-</section>
-<section id="attendance" class="page">
-  <div class="panel"><h2>Attendance entry</h2><label>Meeting</label><select id="attendanceMeeting" onchange="loadRoster()"></select><p class="muted">Eligible members load automatically from the meeting group.</p></div>
-  <div id="rosterPanel" class="panel hidden"><h2 id="rosterTitle">Roster</h2><div class="toolbar"><input id="rosterSearch" placeholder="Search name, TSO or role" oninput="filterRoster()"><button class="secondary" onclick="markAllStatus('Present')">All present</button></div><div id="rosterTotals" class="totals"></div><div id="roster" class="roster"></div><div class="actions"><button class="primary" onclick="saveRoster()">Save attendance</button><button class="secondary" onclick="markAllStatus('Online')">All online</button><button class="secondary" onclick="markAllStatus('Absent')">All absent</button></div></div>
-</section>
-<section id="kpis" class="page">
-  <div class="panel"><h2>KPI dashboard</h2><p class="muted">The existing KPI engine and dashboard are preserved.</p><div class="actions"><button class="primary" onclick="refreshKpis()">Refresh KPIs & Dashboard</button><button class="secondary" onclick="openDashboard()">Open Dashboard sheet</button></div></div>
-</section>
-</main>
+<header>MED-TSO Secretariat Management</header>
+<div class="tabs">
+  <button class="active" onclick="showTab('member',this)">Member</button>
+  <button onclick="showTab('meeting',this)">Meeting</button>
+  <button onclick="showTab('task',this)">Task</button>
+  <button onclick="showTab('tfm',this)">Task Force Member</button>
+</div>
+
+<div id="member" class="panel active">
+  <label>First name</label><input id="mFirst">
+  <label>Last name</label><input id="mLast">
+  <label>Primary email</label><input id="mEmail" type="email">
+  <label>Secondary email</label><input id="mEmail2" type="email">
+  <label>TSO</label><select id="mTso"></select>
+  <label>Country code</label><input id="mCountry" maxlength="2">
+  <label>Role / function</label><input id="mRole">
+  <label>Status</label><select id="mStatus"><option>Active</option><option>Inactive</option><option>Archived</option></select>
+  <button class="save" onclick="saveMember()">Save member</button><div id="mMsg" class="msg"></div>
+</div>
+
+<div id="meeting" class="panel">
+  <label>Technical Committee</label><select id="mtc"></select>
+  <label>Meeting name</label><input id="mName">
+  <label>Date</label><input id="mDate" type="date">
+  <label>Meeting type</label><select id="mType"><option>Regular</option><option>Plenary</option><option>Workshop</option><option>Joint</option><option>Online Call</option></select>
+  <label>Description</label><textarea id="mDesc"></textarea>
+  <label>Status</label><select id="meetStatus"><option>Planned</option><option>Completed</option><option>Cancelled</option></select>
+  <button class="save" onclick="saveMeeting()">Save meeting</button><div id="meetMsg" class="msg"></div>
+</div>
+
+<div id="task" class="panel">
+  <label>Task name</label><input id="tName">
+  <label>Owner</label><input id="tOwner">
+  <label>Due date</label><input id="tDue" type="date">
+  <label>Status</label><select id="tStatus"><option>Not Started</option><option>In Progress</option><option>Completed</option><option>On Hold</option></select>
+  <button class="save" onclick="saveTask()">Save task</button><div id="tMsg" class="msg"></div>
+</div>
+
+<div id="tfm" class="panel">
+  <label>Task force / study team</label><select id="tfName"></select>
+  <label>Member display name</label><input id="tfMember" placeholder="Exact name from TSO Members">
+  <label>TSO code</label><input id="tfTso">
+  <label>Role</label><input id="tfRole" value="Member">
+  <label>Status</label><select id="tfStatus"><option>Active</option><option>Inactive</option><option>Archived</option></select>
+  <button class="save" onclick="saveTFM()">Save task force member</button><div id="tfMsg" class="msg"></div>
+</div>
+
 <script>
-let BOOT=null, ROSTER=null;
-const $=id=>document.getElementById(id), val=id=>$(id).value.trim();
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===b.dataset.page));clearMsg()});
-function call(name,args,ok){let r=google.script.run.withSuccessHandler(ok||done).withFailureHandler(fail);r[name].apply(r,args||[])}
-function init(){call('getSmsBootstrap',[],renderBootstrap)}
-function renderBootstrap(b){BOOT=b;$('version').textContent='Version '+b.version;$('setupBox').classList.toggle('hidden',!b.setupRequired);fillOptions(b);searchMembers();loadMeetingOptions();loadSteeringDashboard()}
-
-function loadSteeringDashboard(){
-  $('steeringLoading').classList.remove('hidden');$('steeringDashboard').classList.add('hidden');
-  google.script.run.withSuccessHandler(renderSteeringDashboard).withFailureHandler(e=>{ $('steeringLoading').textContent='Dashboard could not be loaded: '+(e&&e.message?e.message:String(e)); show(e&&e.message?e.message:String(e),'err'); }).getSteeringCommitteeDashboardV70();
-}
-function renderSteeringDashboard(d){
-  $('steeringLoading').classList.add('hidden');$('steeringDashboard').classList.remove('hidden');
-  const s=d.summary||{};const cards=[['Overall participation',fmtDashPct(s.overallParticipation)],['Active TSOs',s.activeTsos||0],['Active members',s.activeMembers||0],['Active tasks',s.activeTasks||0],['Critical risks',s.criticalRisks||0],['Upcoming meetings',s.upcomingMeetings||0]];
-  $('steeringCards').innerHTML=cards.map(x=>`<div class="dash-kpi"><b>${esc(x[1])}</b><span>${esc(x[0])}</span></div>`).join('');
-  const committees=d.committees||[];$('committeeHealth').innerHTML=committees.length?committees.map(c=>`<div class="health-row" title="${attr(c.participatingTsos+' participating TSOs; '+c.missingTsos.length+' missing')}"><div class="health-name">${esc(c.name)}</div><div class="health-track"><div class="health-fill ${c.risk==='Critical'?'critical':c.risk==='Watch'?'watch':''}" style="width:${Math.max(2,Math.min(100,c.coverage||0))}%"></div></div><div class="health-value">${esc(fmtDashPct(c.coverage))}</div></div>`).join(''):'<div class="muted">No active committees found.</div>';
-  const issues=d.criticalTasks||[];$('steeringIssues').innerHTML=issues.length?issues.map(t=>`<div class="issue"><b>${esc(t.name)}</b><div class="meta">${esc(t.committee)} · ${esc(t.priority||'Normal')}${t.dueDate?' · Due '+esc(t.dueDate):''}${t.status?' · '+esc(t.status):''}</div></div>`).join(''):'<div class="muted">No critical or overdue active tasks.</div>';
-  const meetings=d.upcomingMeetings||[];$('steeringMeetings').innerHTML=meetings.length?meetings.map(m=>`<div class="meeting-row"><div class="meeting-date">${esc(m.date)}</div><div><b>${esc(m.name)}</b><div class="meta">${esc(m.group||'')}</div></div></div>`).join(''):'<div class="muted">No upcoming meetings in the next 60 days.</div>';
-  $('steeringGenerated').textContent='Updated '+(d.generatedAt||'');
-}
-function fmtDashPct(v){return (Math.round(Number(v||0)*10)/10).toFixed(Number(v||0)%1?1:0)+'%'}
-
-function renderMetrics(c){const m=[['Members',c.members],['Active members',c.activeMembers],['Active TSOs',c.tsos],['Technical Committees',c.tcs],['Operational Teams',c.teams],['Task forces',c.taskForces],['Meetings',c.meetings],['Attendance records',c.attendance]];$('metrics').innerHTML=m.map(x=>`<div class="metric"><b>${esc(x[1])}</b><span>${esc(x[0])}</span></div>`).join('')}
-function option(value,text){return `<option value="${attr(value)}">${esc(text)}</option>`}
-function fillOptions(b){const tsos='<option value="">Select TSO…</option>'+b.options.tsos.map(x=>option(x,x)).join('');$('mtso').innerHTML='<option value="">All TSOs</option>'+b.options.tsos.map(x=>option(x,x)).join('');$('memberTso').innerHTML=tsos;const members='<option value="">Select member…</option>'+b.options.members.map(x=>option(x.id,`${x.name} — ${x.tso||'No TSO'}`)).join('');['tcMember','teamMember','spocMember'].forEach(id=>$(id).innerHTML=members);const tcs='<option value="">Select committee…</option>'+b.options.tcs.map(x=>option(x,x)).join('');['tcName','taskTc'].forEach(id=>$(id).innerHTML=tcs);$('workstream').innerHTML='<option value="">Select workstream…</option>'+b.options.workstreams.map(x=>option(x,x)).join('');$('teamId').innerHTML='<option value="">Select team…</option>'+b.teams.map(x=>option(x['Team ID'],x['Team Name'])).join('');const groups=(b.groups||[]);const types=[...new Set(groups.map(g=>g.type))];$('meetingGroup').innerHTML='<option value="">Select meeting group…</option>'+types.map(t=>`<optgroup label="${attr(t)}">${groups.filter(g=>g.type===t).map(g=>option(g.id,g.name+(g.parent?' — '+g.parent:''))).join('')}</optgroup>`).join('')}
-function setupModel(){call('setupSmsV6',[],r=>{ok(r.message);init()})}
-function setupGroups(){call('setupUnifiedGroupsV61',[],r=>{ok(r.message);init()})}
-function searchMembers(){call('getMembers',[{query:val('mq'),tso:val('mtso'),status:val('mstatus')}],rows=>{$('memberCards').innerHTML=rows.length?rows.map(r=>`<div class="card" onclick="editMember('${js(r.id)}')"><b>${esc(r.displayName)}</b><div class="meta"><span class="pill">${esc(r.id)}</span>${r.tsoCode?`<span class="pill">${esc(r.tsoCode)}</span>`:''}<span class="pill">${esc(r.status)}</span><br>${esc(r.email||'')}${r.role?'<br>'+esc(r.role):''}</div></div>`).join(''):'<div class="muted">No matching members.</div>'})}
-function newMember(){clearMember();$('memberFormTitle').textContent='New member';$('memberForm').classList.remove('hidden');$('deactivateBtn').classList.add('hidden')}
-function editMember(id){call('getMember',[id],m=>{Object.entries({memberId:m.memberId,firstName:m.firstName,lastName:m.lastName,primaryEmail:m.primaryEmail,secondaryEmail:m.secondaryEmail,memberType:m.memberType,memberTso:m.tsoCode,countryCode:m.countryCode,role:m.role,memberStatus:m.status,joinedDate:isoDate(m.joinedDate),memberNotes:m.notes}).forEach(([k,v])=>$(k).value=v||'');$('memberFormTitle').textContent='Edit member — '+m.memberId;$('memberForm').classList.remove('hidden');$('deactivateBtn').classList.remove('hidden')})}
-function memberPayload(){return{memberId:val('memberId'),firstName:val('firstName'),lastName:val('lastName'),primaryEmail:val('primaryEmail'),secondaryEmail:val('secondaryEmail'),memberType:val('memberType'),tsoCode:val('memberTso'),countryCode:val('countryCode'),role:val('role'),status:val('memberStatus'),joinedDate:val('joinedDate'),notes:val('memberNotes')}}
-function saveMemberForm(){const p=memberPayload();call(p.memberId?'updateMember':'saveMember',[p],r=>{ok(r.message);closeMember();init()})}
-function deactivateMember(){if(confirm('Set this member to Inactive? Historical records will remain.'))call('softDeleteMember',[val('memberId')],r=>{ok(r.message);closeMember();init()})}
-function clearMember(){['memberId','firstName','lastName','primaryEmail','secondaryEmail','countryCode','role','joinedDate','memberNotes'].forEach(id=>$(id).value='');$('memberType').value='TSO Member';$('memberStatus').value='Active';$('memberTso').value=''}
-function closeMember(){clearMember();$('memberForm').classList.add('hidden')}
-function saveTcMembership(){call('saveTcMembershipV6',[{memberId:val('tcMember'),tcName:val('tcName'),role:val('tcRole'),planningDataSpoc:val('planningSpoc'),status:val('tcStatus')}],r=>ok(r.message))}
-function saveTeamMembership(){call('saveTeamMembershipV6',[{memberId:val('teamMember'),teamId:val('teamId'),role:val('teamRole'),status:'Active'}],r=>ok(r.message))}
-function saveSpoc(){call('saveTsoSpocV6',[{memberId:val('spocMember'),spocType:val('spocType'),primary:val('spocPrimary'),status:'Active'}],r=>ok(r.message))}
-function createMeeting(){call('saveMeetingV61',[{groupId:val('meetingGroup'),meetingName:val('meetingName'),meetingDate:val('meetingDate'),meetingType:val('meetingType'),description:val('meetingDescription'),status:val('meetingStatus')}],id=>{ok('Meeting created: '+id);loadMeetingOptions()})}
-function createTask(){call('saveTask',[{tcName:val('taskTc'),workstream:val('workstream'),taskName:val('taskName'),description:val('taskDescription'),status:val('taskStatus'),priority:val('taskPriority'),dueDate:val('taskDue')}],id=>ok('Task created: '+id))}
-function loadMeetingOptions(){call('getMeetingOptionsV61',[],rows=>{$('attendanceMeeting').innerHTML='<option value="">Select meeting…</option>'+rows.map(x=>option(x.id,`${x.date} — ${x.name}${x.group?' — '+x.group:''}`)).join('')})}
-function loadRoster(){
-  const id=val('attendanceMeeting');
-  if(!id){ROSTER=null;$('rosterPanel').classList.add('hidden');return}
-  $('rosterPanel').classList.remove('hidden');
-  $('rosterTitle').textContent='Loading eligible members…';
-  $('roster').innerHTML='<div class="muted">Please wait…</div>';
-  google.script.run
-    .withSuccessHandler(r=>{
-      ROSTER=r;
-      $('rosterTitle').textContent=r.meeting['Meeting Name']+' — '+(r.groupName||'');
-      renderRoster();
-      const d=r.diagnostics||{};
-      show(`Roster result: ${d.returnedMembers||0} members; ${d.matchingGroupRows||0} matching group rows; group ${d.resolvedGroupId||''}.`, (d.returnedMembers||0)>0?'ok':'warn');
-    })
-    .withFailureHandler(e=>{
-      ROSTER=null;
-      $('rosterTitle').textContent='Roster could not be loaded';
-      $('roster').innerHTML='<div class="muted">'+esc(e&&e.message?e.message:String(e))+'</div>';
-      show(e&&e.message?e.message:String(e),'err');
-    })
-    .getAttendanceRosterV61(id);
-}
-function renderRoster(){if(!ROSTER)return;const q=normalizeText(val('rosterSearch'));$('roster').innerHTML=ROSTER.members.length?ROSTER.members.map((m,i)=>({m,i})).filter(x=>!q||normalizeText([x.m.memberName,x.m.tsoCode,x.m.role].join(' ')).includes(q)).map(x=>`<div class="person"><div><b>${esc(x.m.memberName)}</b><div class="muted">${esc(x.m.tsoCode||'No TSO')} · ${esc(x.m.role||'Member')}</div></div><select data-status="${x.i}" onchange="updateRosterStatus(${x.i},this.value)"><option ${x.m.status==='Present'?'selected':''}>Present</option><option ${x.m.status==='Online'||x.m.status==='Remote'?'selected':''}>Online</option><option ${x.m.status==='Excused'?'selected':''}>Excused</option><option ${x.m.status==='Absent'?'selected':''}>Absent</option></select></div>`).join(''):'<div class="muted">No active eligible members found. Check Group Members after migration.</div>';updateTotals()}
-function normalizeText(v){return String(v||'').toLowerCase().trim()}function filterRoster(){renderRoster()}function updateRosterStatus(i,v){ROSTER.members[i].status=v;updateTotals()}function markAllStatus(v){if(!ROSTER)return;ROSTER.members.forEach(m=>m.status=v);renderRoster()}function updateTotals(){if(!ROSTER)return;const c={Present:0,Online:0,Excused:0,Absent:0};ROSTER.members.forEach(m=>c[m.status==='Remote'?'Online':m.status]=(c[m.status==='Remote'?'Online':m.status]||0)+1);$('rosterTotals').innerHTML=['Present','Online','Excused','Absent'].map(k=>`<div class="total"><b>${c[k]||0}</b><span>${k}</span></div>`).join('')}
-function saveRoster(){if(!ROSTER)return;call('saveAttendanceRosterV61',[{meetingId:ROSTER.meeting['Meeting ID'],members:ROSTER.members}],r=>{ok(r.message);loadRoster()})}
-function refreshKpis(){call('refreshAllKPIs',[],()=>ok('KPIs and dashboard refreshed.'))}function openDashboard(){call('openDashboard',[],()=>ok('Dashboard opened.'))}
-function done(r){ok((r&&r.message)||'Done.')}function ok(t){show(t,'ok')}function fail(e){show(e&&e.message?e.message:String(e),'err')}function clearMsg(){$('msg').className='msg';$('msg').textContent=''}function show(t,c){$('msg').className='msg '+c;$('msg').textContent=t;window.scrollTo({top:0,behavior:'smooth'})}
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function attr(v){return esc(v)}function js(v){return String(v||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}function isoDate(v){if(!v)return'';const d=new Date(v);return isNaN(d)?String(v).slice(0,10):d.toISOString().slice(0,10)}
-init();
+function showTab(id,btn){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active')}
+function fill(id,vals){const s=document.getElementById(id);s.innerHTML='<option value="">Select...</option>'+vals.map(v=>`<option>${v}</option>`).join('')}
+google.script.run.withSuccessHandler(o=>{fill('mTso',o.tsos);fill('mtc',o.tcs);fill('tfName',o.taskForces)}).getFormOptions();
+function done(id,prefix){return x=>{document.getElementById(id).textContent=prefix+' '+x}}
+function saveMember(){google.script.run.withSuccessHandler(done('mMsg','Saved:')).saveMember({firstName:mFirst.value,lastName:mLast.value,primaryEmail:mEmail.value,secondaryEmail:mEmail2.value,tsoCode:mTso.value,countryCode:mCountry.value,role:mRole.value,status:mStatus.value})}
+function saveMeeting(){google.script.run.withSuccessHandler(done('meetMsg','Saved:')).saveMeeting({tcName:mtc.value,meetingName:mName.value,meetingDate:mDate.value,meetingType:mType.value,description:mDesc.value,status:meetStatus.value})}
+function saveTask(){google.script.run.withSuccessHandler(done('tMsg','Saved:')).saveTask({taskName:tName.value,owner:tOwner.value,dueDate:tDue.value,status:tStatus.value})}
+function saveTFM(){google.script.run.withSuccessHandler(done('tfMsg','Saved:')).saveTaskForceMember({taskForce:tfName.value,memberName:tfMember.value,tsoCode:tfTso.value,role:tfRole.value,status:tfStatus.value})}
 </script>
 </body>
 </html>

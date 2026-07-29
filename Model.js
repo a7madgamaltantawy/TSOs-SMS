@@ -4,7 +4,7 @@
  */
 
 const SMS_V6_ = {
-  version: '7.0.0-alpha.1',
+  version: '7.1.0',
   sheets: {
     teams: 'Teams',
     teamMembers: 'Team Members',
@@ -362,7 +362,7 @@ function dateTextV6_(value) {
  * Additive migration: existing sheets and records are preserved.
  */
 const SMS_V61_ = {
-  version: '7.0.0-alpha.1',
+  version: '7.1.0',
   groupsSheet: 'Groups',
   groupMembersSheet: 'Group Members'
 };
