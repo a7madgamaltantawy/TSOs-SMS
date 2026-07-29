@@ -17,18 +17,31 @@
     .msg{display:none;margin-bottom:9px;border-radius:7px;padding:9px}.msg.ok{display:block;background:#eaf7f0;color:#14532d}.msg.err{display:block;background:#fdecec;color:#7f1d1d}.msg.warn{display:block;background:#fff7d6;color:#713f12}
     .cards{max-height:330px;overflow:auto}.card{border:1px solid var(--line);border-radius:7px;padding:9px;margin-bottom:6px;cursor:pointer}.card:hover{border-color:var(--blue)}.card b{color:var(--navy)}.meta{font-size:11px;color:var(--muted);margin-top:3px}.pill{display:inline-block;background:var(--soft);color:var(--blue);font-weight:700;border-radius:99px;padding:2px 6px;margin-right:3px}
     .roster{max-height:390px;overflow:auto}.person{display:grid;grid-template-columns:1fr 105px;gap:7px;align-items:center;border-bottom:1px solid var(--line);padding:7px 0}.person input{width:auto}.muted{color:var(--muted);font-size:11px}.hidden{display:none!important}.toolbar{display:grid;grid-template-columns:1fr auto;gap:7px;margin:8px 0}.totals{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:8px 0}.total{background:var(--soft);border-radius:7px;padding:7px;text-align:center}.total b{display:block;color:var(--navy);font-size:17px}.grouped option{font-weight:normal}
+  
+    .dash-hero{background:linear-gradient(135deg,#123b5d,#1f5f8b);color:white;border-radius:12px;padding:14px;margin-bottom:10px}.dash-hero h2{color:white;font-size:17px;margin:0}.dash-hero p{margin:4px 0 0;opacity:.85;font-size:11px}
+    .dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}.dash-kpi{background:white;border:1px solid var(--line);border-radius:10px;padding:10px;position:relative;overflow:hidden}.dash-kpi:after{content:'';position:absolute;right:-16px;top:-16px;width:48px;height:48px;border-radius:50%;background:var(--soft)}.dash-kpi b{display:block;color:var(--navy);font-size:22px;position:relative;z-index:1}.dash-kpi span{font-size:10px;color:var(--muted);position:relative;z-index:1}
+    .health-list{display:grid;gap:8px}.health-row{display:grid;grid-template-columns:minmax(100px,1fr) 2fr 46px;gap:8px;align-items:center}.health-name{font-weight:700;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.health-track{height:10px;background:#e7edf1;border-radius:99px;overflow:hidden}.health-fill{height:100%;background:var(--ok);border-radius:99px}.health-fill.watch{background:#b7791f}.health-fill.critical{background:var(--bad)}.health-value{text-align:right;font-weight:700;font-size:11px}
+    .issue-list{display:grid;gap:6px}.issue{border-left:4px solid var(--bad);background:#fff;border-radius:7px;padding:8px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.issue b{color:var(--navy);font-size:11px}.meeting-row{display:grid;grid-template-columns:72px 1fr;gap:8px;border-bottom:1px solid var(--line);padding:7px 0}.meeting-row:last-child{border-bottom:0}.meeting-date{font-weight:700;color:var(--blue);font-size:10px}.dash-meta{text-align:right;color:var(--muted);font-size:9px;margin-top:6px}
+    @media(max-width:620px){.dash-grid{grid-template-columns:repeat(2,1fr)}.health-row{grid-template-columns:95px 1fr 42px}}
   </style>
 </head>
 <body>
 <header><h1>MED-TSO Secretariat Management System</h1><small id="version">Loading…</small></header>
 <nav>
-  <button class="active" data-page="home">Home</button><button data-page="members">Members</button><button data-page="structure">Structure</button>
+  <button class="active" data-page="home">Steering Dashboard</button><button data-page="members">Members</button><button data-page="structure">Structure</button>
   <button data-page="meetings">Meetings</button><button data-page="attendance">Attendance</button><button data-page="kpis">KPIs</button>
 </nav>
 <main>
 <div id="msg" class="msg"></div>
 <section id="home" class="page active">
-  <div class="panel"><h2>System overview</h2><div id="metrics" class="metrics"></div></div>
+  <div class="dash-hero"><h2>Steering Committee Dashboard</h2><p>Governance, participation and delivery overview. Data is read directly from the management workbook.</p></div>
+  <div id="steeringLoading" class="panel muted">Loading Steering Committee indicators…</div>
+  <div id="steeringDashboard" class="hidden">
+    <div id="steeringCards" class="dash-grid"></div>
+    <div class="panel"><div class="exec-head"><h2>Committee health</h2><button class="secondary" onclick="loadSteeringDashboard()">Refresh</button></div><div id="committeeHealth" class="health-list"></div></div>
+    <div class="panel"><h2>Critical tasks and risks</h2><div id="steeringIssues" class="issue-list"></div></div>
+    <div class="panel"><h2>Upcoming meetings — next 60 days</h2><div id="steeringMeetings"></div><div id="steeringGenerated" class="dash-meta"></div></div>
+  </div>
   <div id="setupBox" class="panel hidden"><h2>One-time setup</h2><p class="muted">Create the unified Groups and Group Members model and migrate existing committee, team, task-force and governance memberships. Existing sheets and records are preserved.</p><button class="primary" onclick="setupGroups()">Initialize unified groups</button></div>
 </section>
 <section id="members" class="page">
@@ -36,7 +49,6 @@
   <div id="memberForm" class="panel hidden"><h2 id="memberFormTitle">New member</h2><input type="hidden" id="memberId"><div class="grid">
     <div><label>First name *</label><input id="firstName"></div><div><label>Last name *</label><input id="lastName"></div>
     <div class="full"><label>Primary email *</label><input id="primaryEmail" type="email"></div><div class="full"><label>Secondary email</label><input id="secondaryEmail" type="email"></div>
-    <div class="full"><label>Primary phone</label><input id="primaryPhone" type="tel"></div>
     <div><label>Member type</label><select id="memberType"><option>TSO Member</option><option>Secretariat Member</option><option>External Expert</option><option>Observer</option></select></div><div><label>Status</label><select id="memberStatus"><option>Active</option><option>Inactive</option><option>Archived</option></select></div>
     <div><label>TSO</label><select id="memberTso"></select></div><div><label>Country code</label><input id="countryCode"></div>
     <div class="full"><label>Role / function</label><input id="role"></div><div class="full"><label>Joined TEASIMED3 date</label><input id="joinedDate" type="date"></div>
@@ -66,19 +78,35 @@ const $=id=>document.getElementById(id), val=id=>$(id).value.trim();
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===b.dataset.page));clearMsg()});
 function call(name,args,ok){let r=google.script.run.withSuccessHandler(ok||done).withFailureHandler(fail);r[name].apply(r,args||[])}
 function init(){call('getSmsBootstrap',[],renderBootstrap)}
-function renderBootstrap(b){BOOT=b;$('version').textContent='Version '+b.version;$('setupBox').classList.toggle('hidden',!b.setupRequired);renderMetrics(b.counts);fillOptions(b);searchMembers();loadMeetingOptions()}
+function renderBootstrap(b){BOOT=b;$('version').textContent='Version '+b.version;$('setupBox').classList.toggle('hidden',!b.setupRequired);fillOptions(b);searchMembers();loadMeetingOptions();loadSteeringDashboard()}
+
+function loadSteeringDashboard(){
+  $('steeringLoading').classList.remove('hidden');$('steeringDashboard').classList.add('hidden');
+  google.script.run.withSuccessHandler(renderSteeringDashboard).withFailureHandler(e=>{ $('steeringLoading').textContent='Dashboard could not be loaded: '+(e&&e.message?e.message:String(e)); show(e&&e.message?e.message:String(e),'err'); }).getSteeringCommitteeDashboardV70();
+}
+function renderSteeringDashboard(d){
+  $('steeringLoading').classList.add('hidden');$('steeringDashboard').classList.remove('hidden');
+  const s=d.summary||{};const cards=[['Overall participation',fmtDashPct(s.overallParticipation)],['Active TSOs',s.activeTsos||0],['Active members',s.activeMembers||0],['Active tasks',s.activeTasks||0],['Critical risks',s.criticalRisks||0],['Upcoming meetings',s.upcomingMeetings||0]];
+  $('steeringCards').innerHTML=cards.map(x=>`<div class="dash-kpi"><b>${esc(x[1])}</b><span>${esc(x[0])}</span></div>`).join('');
+  const committees=d.committees||[];$('committeeHealth').innerHTML=committees.length?committees.map(c=>`<div class="health-row" title="${attr(c.participatingTsos+' participating TSOs; '+c.missingTsos.length+' missing')}"><div class="health-name">${esc(c.name)}</div><div class="health-track"><div class="health-fill ${c.risk==='Critical'?'critical':c.risk==='Watch'?'watch':''}" style="width:${Math.max(2,Math.min(100,c.coverage||0))}%"></div></div><div class="health-value">${esc(fmtDashPct(c.coverage))}</div></div>`).join(''):'<div class="muted">No active committees found.</div>';
+  const issues=d.criticalTasks||[];$('steeringIssues').innerHTML=issues.length?issues.map(t=>`<div class="issue"><b>${esc(t.name)}</b><div class="meta">${esc(t.committee)} · ${esc(t.priority||'Normal')}${t.dueDate?' · Due '+esc(t.dueDate):''}${t.status?' · '+esc(t.status):''}</div></div>`).join(''):'<div class="muted">No critical or overdue active tasks.</div>';
+  const meetings=d.upcomingMeetings||[];$('steeringMeetings').innerHTML=meetings.length?meetings.map(m=>`<div class="meeting-row"><div class="meeting-date">${esc(m.date)}</div><div><b>${esc(m.name)}</b><div class="meta">${esc(m.group||'')}</div></div></div>`).join(''):'<div class="muted">No upcoming meetings in the next 60 days.</div>';
+  $('steeringGenerated').textContent='Updated '+(d.generatedAt||'');
+}
+function fmtDashPct(v){return (Math.round(Number(v||0)*10)/10).toFixed(Number(v||0)%1?1:0)+'%'}
+
 function renderMetrics(c){const m=[['Members',c.members],['Active members',c.activeMembers],['Active TSOs',c.tsos],['Technical Committees',c.tcs],['Operational Teams',c.teams],['Task forces',c.taskForces],['Meetings',c.meetings],['Attendance records',c.attendance]];$('metrics').innerHTML=m.map(x=>`<div class="metric"><b>${esc(x[1])}</b><span>${esc(x[0])}</span></div>`).join('')}
 function option(value,text){return `<option value="${attr(value)}">${esc(text)}</option>`}
 function fillOptions(b){const tsos='<option value="">Select TSO…</option>'+b.options.tsos.map(x=>option(x,x)).join('');$('mtso').innerHTML='<option value="">All TSOs</option>'+b.options.tsos.map(x=>option(x,x)).join('');$('memberTso').innerHTML=tsos;const members='<option value="">Select member…</option>'+b.options.members.map(x=>option(x.id,`${x.name} — ${x.tso||'No TSO'}`)).join('');['tcMember','teamMember','spocMember'].forEach(id=>$(id).innerHTML=members);const tcs='<option value="">Select committee…</option>'+b.options.tcs.map(x=>option(x,x)).join('');['tcName','taskTc'].forEach(id=>$(id).innerHTML=tcs);$('workstream').innerHTML='<option value="">Select workstream…</option>'+b.options.workstreams.map(x=>option(x,x)).join('');$('teamId').innerHTML='<option value="">Select team…</option>'+b.teams.map(x=>option(x['Team ID'],x['Team Name'])).join('');const groups=(b.groups||[]);const types=[...new Set(groups.map(g=>g.type))];$('meetingGroup').innerHTML='<option value="">Select meeting group…</option>'+types.map(t=>`<optgroup label="${attr(t)}">${groups.filter(g=>g.type===t).map(g=>option(g.id,g.name+(g.parent?' — '+g.parent:''))).join('')}</optgroup>`).join('')}
 function setupModel(){call('setupSmsV6',[],r=>{ok(r.message);init()})}
 function setupGroups(){call('setupUnifiedGroupsV61',[],r=>{ok(r.message);init()})}
-function searchMembers(){call('getMembers',[{query:val('mq'),tso:val('mtso'),status:val('mstatus')}],rows=>{$('memberCards').innerHTML=rows.length?rows.map(r=>{const tcs=(r.technicalCommittees||[]).map(esc).join(', ');const tasks=(r.assignedTasks||[]).map(esc).join(', ');return `<div class="card" onclick="editMember('${js(r.id)}')"><b>${esc(r.displayName)}</b><div class="meta"><span class="pill">${esc(r.id)}</span>${r.tsoCode?`<span class="pill">${esc(r.tsoCode)}</span>`:''}<span class="pill">${esc(r.status)}</span><br>${esc(r.email||'')}${r.primaryPhone?'<br><b>Phone:</b> '+esc(r.primaryPhone):''}${r.role?'<br>'+esc(r.role):''}${tcs?'<br><b>Technical Committees:</b> '+tcs:''}${tasks?'<br><b>Assigned Tasks:</b> '+tasks:''}</div></div>`}).join(''):'<div class="muted">No matching members.</div>'})}
+function searchMembers(){call('getMembers',[{query:val('mq'),tso:val('mtso'),status:val('mstatus')}],rows=>{$('memberCards').innerHTML=rows.length?rows.map(r=>`<div class="card" onclick="editMember('${js(r.id)}')"><b>${esc(r.displayName)}</b><div class="meta"><span class="pill">${esc(r.id)}</span>${r.tsoCode?`<span class="pill">${esc(r.tsoCode)}</span>`:''}<span class="pill">${esc(r.status)}</span><br>${esc(r.email||'')}${r.role?'<br>'+esc(r.role):''}</div></div>`).join(''):'<div class="muted">No matching members.</div>'})}
 function newMember(){clearMember();$('memberFormTitle').textContent='New member';$('memberForm').classList.remove('hidden');$('deactivateBtn').classList.add('hidden')}
-function editMember(id){call('getMember',[id],m=>{Object.entries({memberId:m.memberId,firstName:m.firstName,lastName:m.lastName,primaryEmail:m.primaryEmail,secondaryEmail:m.secondaryEmail,primaryPhone:m.primaryPhone,memberType:m.memberType,memberTso:m.tsoCode,countryCode:m.countryCode,role:m.role,memberStatus:m.status,joinedDate:isoDate(m.joinedDate),memberNotes:m.notes}).forEach(([k,v])=>$(k).value=v||'');$('memberFormTitle').textContent='Edit member — '+m.memberId;$('memberForm').classList.remove('hidden');$('deactivateBtn').classList.remove('hidden')})}
-function memberPayload(){return{memberId:val('memberId'),firstName:val('firstName'),lastName:val('lastName'),primaryEmail:val('primaryEmail'),secondaryEmail:val('secondaryEmail'),primaryPhone:val('primaryPhone'),memberType:val('memberType'),tsoCode:val('memberTso'),countryCode:val('countryCode'),role:val('role'),status:val('memberStatus'),joinedDate:val('joinedDate'),notes:val('memberNotes')}}
+function editMember(id){call('getMember',[id],m=>{Object.entries({memberId:m.memberId,firstName:m.firstName,lastName:m.lastName,primaryEmail:m.primaryEmail,secondaryEmail:m.secondaryEmail,memberType:m.memberType,memberTso:m.tsoCode,countryCode:m.countryCode,role:m.role,memberStatus:m.status,joinedDate:isoDate(m.joinedDate),memberNotes:m.notes}).forEach(([k,v])=>$(k).value=v||'');$('memberFormTitle').textContent='Edit member — '+m.memberId;$('memberForm').classList.remove('hidden');$('deactivateBtn').classList.remove('hidden')})}
+function memberPayload(){return{memberId:val('memberId'),firstName:val('firstName'),lastName:val('lastName'),primaryEmail:val('primaryEmail'),secondaryEmail:val('secondaryEmail'),memberType:val('memberType'),tsoCode:val('memberTso'),countryCode:val('countryCode'),role:val('role'),status:val('memberStatus'),joinedDate:val('joinedDate'),notes:val('memberNotes')}}
 function saveMemberForm(){const p=memberPayload();call(p.memberId?'updateMember':'saveMember',[p],r=>{ok(r.message);closeMember();init()})}
 function deactivateMember(){if(confirm('Set this member to Inactive? Historical records will remain.'))call('softDeleteMember',[val('memberId')],r=>{ok(r.message);closeMember();init()})}
-function clearMember(){['memberId','firstName','lastName','primaryEmail','secondaryEmail','primaryPhone','countryCode','role','joinedDate','memberNotes'].forEach(id=>$(id).value='');$('memberType').value='TSO Member';$('memberStatus').value='Active';$('memberTso').value=''}
+function clearMember(){['memberId','firstName','lastName','primaryEmail','secondaryEmail','countryCode','role','joinedDate','memberNotes'].forEach(id=>$(id).value='');$('memberType').value='TSO Member';$('memberStatus').value='Active';$('memberTso').value=''}
 function closeMember(){clearMember();$('memberForm').classList.add('hidden')}
 function saveTcMembership(){call('saveTcMembershipV6',[{memberId:val('tcMember'),tcName:val('tcName'),role:val('tcRole'),planningDataSpoc:val('planningSpoc'),status:val('tcStatus')}],r=>ok(r.message))}
 function saveTeamMembership(){call('saveTeamMembershipV6',[{memberId:val('teamMember'),teamId:val('teamId'),role:val('teamRole'),status:'Active'}],r=>ok(r.message))}
